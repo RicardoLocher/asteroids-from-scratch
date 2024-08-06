@@ -11,7 +11,8 @@ FetchContent_Declare(SFML
 FetchContent_MakeAvailable(SFML)
 
 add_executable(untitled src/main.cpp
-        src/GameClass.h)
+        src/GameClass.h
+        src/PlayerClass.h)
 target_link_libraries(untitled PRIVATE sfml-graphics)
 target_compile_features(untitled PRIVATE cxx_std_17)
 
