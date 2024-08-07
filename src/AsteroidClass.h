@@ -8,9 +8,12 @@
 
 class Asteroid {
 public:
-    Asteroid(const sf::Vector2f pos, const sf::Texture& texture, const float dir) {
+    bool isMini;
+    Asteroid(const sf::Vector2f pos, const sf::Texture& texture, const float dir, bool mini) {
         sprite.setTexture(texture);
         sprite.setPosition(pos);
+
+        isMini = mini;
 
         image = texture.copyToImage(); // Extract Pixel data for collision detection.
 

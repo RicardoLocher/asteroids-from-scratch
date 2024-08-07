@@ -69,20 +69,35 @@ public:
     }
 
     void generateAsteroids(const int level) {
+        const sf::Vector2f playerPos = {WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f};
+        const float minDistance = 400.0f; // Minimum distance from the player
         for (int i = 1; i < (level + 5); i++) {
-            asteroids.emplace_back(generateAsteroid_Pos(), asteroid1, generateAsteroid_Direction());
+            asteroids.emplace_back(generateAsteroid_Pos(playerPos, minDistance), asteroid1, generateAsteroid_Direction(), false);
         }
     }
 
-    static sf::Vector2f generateAsteroid_Pos() {
+    void generateMiniAsteroids(sf::Vector2f pos) {
+        for (int i = 0; i < 2; i++) {
+            asteroids.emplace_back(pos, asteroid2, generateAsteroid_Direction(), true);
+        }
+    }
+
+    static sf::Vector2f generateAsteroid_Pos(const sf::Vector2f& playerPos, float minDistance) {
         std::random_device rd;
         std::mt19937 gen(rd());
         std::uniform_int_distribution<> distr1(0, 1920);
         std::uniform_int_distribution<> distr2(0, 1080);
-        const int num1 = distr1(gen);
-        const int num2 = distr2(gen);
-        return {static_cast<float>(num1), static_cast<float>(num2)};
+
+        sf::Vector2f asteroidPos;
+        do {
+            const int num1 = distr1(gen);
+            const int num2 = distr2(gen);
+            asteroidPos = {static_cast<float>(num1), static_cast<float>(num2)};
+        } while (std::sqrt(std::pow(asteroidPos.x - playerPos.x, 2) + std::pow(asteroidPos.y - playerPos.y, 2)) < minDistance);
+
+        return asteroidPos;
     }
+
 
     static float generateAsteroid_Direction() {
         std::random_device rd;
@@ -184,12 +199,18 @@ private:
                 if (pixelPerfectCollision(laserIt->getSprite(), player.getImage(), asteroidIt->getSprite(), asteroidIt->getImage())) {
                     // Handle collision (e.g., destroy asteroid, remove laser)
                     // ReSharper disable once CppDFAUnusedValue
-                    asteroidIt = asteroids.erase(asteroidIt);
+                    if (asteroidIt -> isMini) {
+                        asteroidIt = asteroids.erase(asteroidIt);
+                    }
+                    else {
+                        sf::Vector2f pos = asteroidIt -> getPosition();
+                        asteroidIt = asteroids.erase(asteroidIt);
+                        generateMiniAsteroids(pos);
+                    }
                     laserHit = true;
                     break;
-                } else {
-                    ++asteroidIt;
                 }
+                ++asteroidIt;
             }
             if (laserHit) {
                 laserIt = lasers.erase(laserIt);
