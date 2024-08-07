@@ -14,7 +14,10 @@
 
 class Player {
 public:
-    Player() : playerSprite() {
+
+    int playerLevel;
+
+    Player(const int WINDOW_WIDTH, const int WINDOW_HEIGHT) : playerSprite() {
         if (!playerTexture.loadFromFile("../../assets/ship.png")) {
             std::cout << "Error loading Player Texture\n";
             return;
@@ -28,12 +31,13 @@ public:
         laserTexture.setSmooth(true);
 
         playerSprite.setTexture(playerTexture);
-        playerSprite.setPosition(100, 100);
+        playerSprite.setPosition(static_cast<float>(WINDOW_WIDTH) / 2.f, static_cast<float>(WINDOW_HEIGHT) / 2.f);
         pIsMovingForward = false;
         pIsMovingBackwards = false;
         pIsRotatingLeft = false;
         pIsRotatingRight = false;
         pIsShooting = false;
+        playerLevel = 1;
 
         const sf::FloatRect bounds = playerSprite.getLocalBounds();
         playerSprite.setOrigin(bounds.width / 2.f, bounds.height / 2.f);
@@ -44,7 +48,7 @@ public:
         else if (key == sf::Keyboard::S) pIsMovingBackwards = isPressed;
         else if (key == sf::Keyboard::D) pIsRotatingRight = isPressed;
         else if (key == sf::Keyboard::A) pIsRotatingLeft = isPressed;
-        else if (key == sf::Keyboard::Space) shootLaser();
+        else if (key == sf::Keyboard::Space && isPressed) shootLaser();
     }
 
     void update(const sf::Time deltaTime, const int windowWidth, const int windowHeight) {
@@ -66,8 +70,6 @@ public:
         if (pIsRotatingLeft) playerSprite.rotate(-rotationSpeed * deltaTime.asSeconds());
         if (pIsRotatingRight) playerSprite.rotate(rotationSpeed * deltaTime.asSeconds());
 
-
-
         updateLasers(deltaTime, windowWidth, windowHeight);
     }
 
@@ -76,6 +78,10 @@ public:
         for (const auto& laser : lasers) {
             laser.render(window);
         }
+    }
+
+    sf::FloatRect getBounds() const {
+        return playerSprite.getGlobalBounds();
     }
 
 private:
@@ -124,7 +130,7 @@ private:
     bool pIsShooting;
 
     float playerRadius = 10.f;
-    float movementSpeed = 1000.f;
+    float movementSpeed = 500.f;
     float rotationSpeed = 200.f;
 };
 

@@ -12,7 +12,6 @@ class Laser {
 public:
     Laser(const sf::Vector2f pos, const float rotation, const sf::Texture& texture) {
 
-
         laserSprite.setTexture(texture);
         laserSprite.setPosition(pos);
         laserSprite.setRotation(rotation);
