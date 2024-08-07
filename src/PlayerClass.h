@@ -32,6 +32,9 @@ public:
 
         playerSprite.setTexture(playerTexture);
         playerSprite.setPosition(static_cast<float>(WINDOW_WIDTH) / 2.f, static_cast<float>(WINDOW_HEIGHT) / 2.f);
+
+        image = playerTexture.copyToImage(); // Extract Pixel data for collision detection.
+
         pIsMovingForward = false;
         pIsMovingBackwards = false;
         pIsRotatingLeft = false;
@@ -84,6 +87,18 @@ public:
         return playerSprite.getGlobalBounds();
     }
 
+    const sf::Image& getImage() const {
+        return image;
+    }
+
+    const sf::Sprite& getSprite() const {
+        return playerSprite;
+    }
+
+    std::vector<Laser>& getLasers() {
+        return lasers;
+    }
+
 private:
     static void checkWindowBounds(sf::Vector2f& position, const int windowWidth, const int windowHeight) {
         if (position.x < 0.f) {
@@ -122,6 +137,8 @@ private:
     sf::Texture laserTexture;
     sf::Sprite playerSprite;
     std::vector<Laser> lasers;
+
+    sf::Image image;
 
     bool pIsMovingForward;
     bool pIsMovingBackwards;

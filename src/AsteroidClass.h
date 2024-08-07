@@ -12,6 +12,8 @@ public:
         sprite.setTexture(texture);
         sprite.setPosition(pos);
 
+        image = texture.copyToImage(); // Extract Pixel data for collision detection.
+
         const float radian = 3.14159265 * (dir / 180); // NOLINT(*-narrowing-conversions)
         const sf::Vector2f forward(std::cos(radian), std::sin(radian));
         direction = forward;
@@ -42,6 +44,14 @@ public:
         return sprite.getGlobalBounds();
     }
 
+    const sf::Image& getImage() const {
+        return image;
+    }
+
+    const sf::Sprite& getSprite() const {
+        return sprite;
+    }
+
 private:
 
     static void checkWindowBounds(sf::Vector2f& position, const int windowWidth, const int windowHeight) {
@@ -63,6 +73,7 @@ private:
     sf::Vector2f direction;
     float speed = 200.f;
 
+    sf::Image image;
 };
 
 #endif //ASTEROIDCLASS_H

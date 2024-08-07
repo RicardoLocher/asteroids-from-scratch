@@ -12,6 +12,7 @@
 
 #include "PlayerClass.h"
 #include "AsteroidClass.h"
+#include "LaserClass.h"
 
 class Game {
 public:
@@ -25,6 +26,9 @@ public:
         }
         if (!asteroid1.loadFromFile("../../assets/meteor.png")) {
             std::cout << "Error Loading meteor.png \n";
+        }
+        if (!asteroid2.loadFromFile("../../assets/meteor2.png")) {
+            std::cout << "Error Loading meteor2.png \n";
         }
 
         fps = 0;
@@ -46,7 +50,7 @@ public:
             while (timeSinceLastUpdate > TimePerFrame) {
                 timeSinceLastUpdate -= TimePerFrame;
                 processEvents();
-                checkCollision();
+                checkCollisionsPlayerAndAsteroids();
                 update(TimePerFrame);
             }
             render();
@@ -142,14 +146,67 @@ private:
         }
     }
 
-    void checkCollision() const {
-        sf::FloatRect playerBounds = player.getBounds();
+    // ReSharper disable once CppMemberFunctionMayBeConst
+    void checkCollisionsPlayerAndAsteroids() {
         for (const auto& asteroid : asteroids) {
-            sf::FloatRect asteroidBounds = asteroid.getBounds();
-            if (playerBounds.intersects(asteroidBounds)) {
-                std::cout << "Player got hit \n";
+            if (pixelPerfectCollision(player.getSprite(), player.getImage(), asteroid.getSprite(), asteroid.getImage())) {
+                std::cout << "Pixel-perfect collision detected!" << std::endl;
             }
         }
+
+        // Check collisions between lasers and asteroids
+        auto& lasers = player.getLasers();
+        for (auto laserIt = lasers.begin(); laserIt != lasers.end(); ) {
+            bool laserHit = false;
+            for (auto asteroidIt = asteroids.begin(); asteroidIt != asteroids.end(); ) {
+                if (pixelPerfectCollision(laserIt->getSprite(), player.getImage(), asteroidIt->getSprite(), asteroidIt->getImage())) {
+                    // Handle collision (e.g., destroy asteroid, remove laser)
+                    asteroidIt = asteroids.erase(asteroidIt);
+                    laserHit = true;
+                    break;
+                } else {
+                    ++asteroidIt;
+                }
+            }
+            if (laserHit) {
+                laserIt = lasers.erase(laserIt);
+            } else {
+                ++laserIt;
+            }
+        }
+    }
+
+    static bool pixelPerfectCollision(const sf::Sprite& sprite1, const sf::Image& image1, const sf::Sprite& sprite2, const sf::Image& image2) {
+        sf::FloatRect bounds1 = sprite1.getGlobalBounds();
+        sf::FloatRect bounds2 = sprite2.getGlobalBounds();
+
+        if (!bounds1.intersects(bounds2)) {
+            return false;
+        }
+
+        sf::FloatRect intersection;
+        if (bounds1.intersects(bounds2, intersection)) {
+            for (int x = intersection.left; x < intersection.left + intersection.width; ++x) { // NOLINT(*-narrowing-conversions)
+                for (int y = intersection.top; y < intersection.top + intersection.height; ++y) { // NOLINT(*-narrowing-conversions)
+                    // ReSharper disable CppTooWideScopeInitStatement
+                    const sf::Vector2f point1 = sprite1.getInverseTransform().transformPoint(static_cast<float>(x), static_cast<float>(y));
+                    const sf::Vector2f point2 = sprite2.getInverseTransform().transformPoint(static_cast<float>(x), static_cast<float>(y));
+                    // ReSharper restore CppTooWideScopeInitStatement
+
+                    if (point1.x >= 0 && point1.x < image1.getSize().x && // NOLINT(*-narrowing-conversions)
+                        point1.y >= 0 && point1.y < image1.getSize().y && // NOLINT(*-narrowing-conversions)
+                        point2.x >= 0 && point2.x < image2.getSize().x && // NOLINT(*-narrowing-conversions)
+                        point2.y >= 0 && point2.y < image2.getSize().y) { // NOLINT(*-narrowing-conversions)
+
+                        if (image1.getPixel(static_cast<unsigned int>(point1.x), static_cast<unsigned int>(point1.y)).a != 0 &&
+                            image2.getPixel(static_cast<unsigned int>(point2.x), static_cast<unsigned int>(point2.y)).a != 0) {
+                            return true;
+                            }
+                        }
+                }
+            }
+        }
+        return false;
     }
 
     sf::RenderWindow window;
@@ -166,6 +223,7 @@ private:
 
     std::vector<Asteroid> asteroids;
     sf::Texture asteroid1;
+    sf::Texture asteroid2;
 };
 
 #endif //GAMECLASS_H

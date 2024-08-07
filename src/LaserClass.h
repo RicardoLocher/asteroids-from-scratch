@@ -15,6 +15,7 @@ public:
         laserSprite.setTexture(texture);
         laserSprite.setPosition(pos);
         laserSprite.setRotation(rotation);
+        image = texture.copyToImage();
 
         const sf::FloatRect bounds = laserSprite.getLocalBounds();
         laserSprite.setOrigin(bounds.width / 2.f, bounds.height / 2.f);
@@ -36,10 +37,19 @@ public:
         return laserSprite.getPosition();
     }
 
+    const sf::Image& getImage() const {
+        return image;
+    }
+
+    const sf::Sprite& getSprite() const {
+        return laserSprite;
+    }
+
 private:
     sf::Sprite laserSprite;
     sf::Vector2f direction;
     float speed = 1500.f;
+    sf::Image image;
 };
 
 #endif //LASERCLASS_H
