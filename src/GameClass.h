@@ -16,8 +16,8 @@
 
 class Game {
 public:
-    const int WINDOW_WIDTH = 1920;
-    const int WINDOW_HEIGHT = 1080;
+    const int WINDOW_WIDTH = 3440;
+    const int WINDOW_HEIGHT = 1440;
 
     Game() : window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFML ROCKS!!!"), player(WINDOW_WIDTH, WINDOW_HEIGHT), font(), fpsText() {
         if (!font.loadFromFile("../../assets/manolomono.otf")) {
@@ -38,6 +38,15 @@ public:
         fpsText.setFillColor(sf::Color::White);
         fpsText.setPosition(10.f, 10.f);
 
+        gameOver = false;
+        gameOverText.setFont(font);
+        gameOverText.setCharacterSize(50);
+        gameOverText.setFillColor(sf::Color::Red);
+        gameOverText.setString("GAME OVER\nPress 'R' to restart!");
+        sf::FloatRect textRect = gameOverText.getLocalBounds();
+        gameOverText.setOrigin(textRect.width / 2, textRect.height / 2);
+        gameOverText.setPosition(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2); // NOLINT(*-narrowing-conversions, *-integer-division)
+
         generateAsteroids(player.playerLevel);
     }
 
@@ -46,27 +55,22 @@ public:
         sf::Time timeSinceLastUpdate = sf::Time::Zero;
         while (window.isOpen()) {
             processEvents();
-            timeSinceLastUpdate += clock.restart();
-            while (timeSinceLastUpdate > TimePerFrame) {
-                timeSinceLastUpdate -= TimePerFrame;
-                processEvents();
-                checkCollisionsPlayerAndAsteroids();
-                update(TimePerFrame);
+            if (!gameOver) {
+                timeSinceLastUpdate += clock.restart();
+                while (timeSinceLastUpdate > TimePerFrame) {
+                    timeSinceLastUpdate -= TimePerFrame;
+                    processEvents();
+                    checkCollisions();
+                    update(TimePerFrame);
+                }
             }
             render();
         }
     }
 
     void generateAsteroids(const int level) {
-        switch (level) { // NOLINT(*-multiway-paths-covered)
-            case 1:
-                for (int i = 1; i < 5; i++) {
-                    asteroids.emplace_back(generateAsteroid_Pos(), asteroid1, generateAsteroid_Direction());
-                }
-            default:
-                for (int i = 0; i < 1; i++) {
-                    asteroids.emplace_back(generateAsteroid_Pos(), asteroid1, generateAsteroid_Direction());
-                }
+        for (int i = 1; i < (level + 5); i++) {
+            asteroids.emplace_back(generateAsteroid_Pos(), asteroid1, generateAsteroid_Direction());
         }
     }
 
@@ -88,6 +92,15 @@ public:
         return static_cast<float>(num);
     }
 
+    void resetGame() {
+        player.reset(WINDOW_WIDTH, WINDOW_HEIGHT);
+        asteroids.clear();
+        generateAsteroids(player.playerLevel);
+        gameOver = false;
+        frameCount = 0;
+        fpsClock.restart();
+    }
+
 private:
     void processEvents() {
         sf::Event event{};
@@ -96,8 +109,12 @@ private:
             // ReSharper disable once CppIncompleteSwitchStatement
             switch (event.type) {
                 case sf::Event::KeyPressed:
-                    player.handleInput(event.key.code, true);
-                    break;
+                    if (gameOver && event.key.code == sf::Keyboard::R) {
+                        resetGame();
+                    } else {
+                        player.handleInput(event.key.code, true);
+                    }
+                break;
 
                 case sf::Event::KeyReleased:
                     player.handleInput(event.key.code, false);
@@ -124,10 +141,14 @@ private:
 
     void render() {
         window.clear();
-        player.render(window);
-        window.draw(fpsText);
-        for (const auto& asteroid : asteroids) {
-            asteroid.render(window);
+        if  (gameOver) {
+            window.draw(gameOverText);
+        } else {
+            player.render(window);
+            window.draw(fpsText);
+            for (const auto& asteroid : asteroids) {
+                asteroid.render(window);
+            }
         }
         window.display();
     }
@@ -147,10 +168,11 @@ private:
     }
 
     // ReSharper disable once CppMemberFunctionMayBeConst
-    void checkCollisionsPlayerAndAsteroids() {
+    void checkCollisions() {
         for (const auto& asteroid : asteroids) {
             if (pixelPerfectCollision(player.getSprite(), player.getImage(), asteroid.getSprite(), asteroid.getImage())) {
-                std::cout << "Pixel-perfect collision detected!" << std::endl;
+                gameOver = true;
+                return;
             }
         }
 
@@ -161,6 +183,7 @@ private:
             for (auto asteroidIt = asteroids.begin(); asteroidIt != asteroids.end(); ) {
                 if (pixelPerfectCollision(laserIt->getSprite(), player.getImage(), asteroidIt->getSprite(), asteroidIt->getImage())) {
                     // Handle collision (e.g., destroy asteroid, remove laser)
+                    // ReSharper disable once CppDFAUnusedValue
                     asteroidIt = asteroids.erase(asteroidIt);
                     laserHit = true;
                     break;
@@ -210,10 +233,9 @@ private:
     }
 
     sf::RenderWindow window;
+    sf::Time TimePerFrame = sf::seconds(1.f / 144.f);
 
     Player player;
-
-    sf::Time TimePerFrame = sf::seconds(1.f / 144.f);
 
     sf::Font font;
     sf::Text fpsText;
@@ -224,6 +246,9 @@ private:
     std::vector<Asteroid> asteroids;
     sf::Texture asteroid1;
     sf::Texture asteroid2;
+
+    bool gameOver;
+    sf::Text gameOverText;
 };
 
 #endif //GAMECLASS_H

@@ -71,7 +71,7 @@ private:
 
     sf::Sprite sprite;
     sf::Vector2f direction;
-    float speed = 200.f;
+    float speed = 300.f;
 
     sf::Image image;
 };

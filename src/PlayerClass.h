@@ -16,6 +16,7 @@ class Player {
 public:
 
     int playerLevel;
+    int initialPlayerLevel = 10;
 
     Player(const int WINDOW_WIDTH, const int WINDOW_HEIGHT) : playerSprite() {
         if (!playerTexture.loadFromFile("../../assets/ship.png")) {
@@ -40,7 +41,7 @@ public:
         pIsRotatingLeft = false;
         pIsRotatingRight = false;
         pIsShooting = false;
-        playerLevel = 1;
+        playerLevel = initialPlayerLevel;
 
         const sf::FloatRect bounds = playerSprite.getLocalBounds();
         playerSprite.setOrigin(bounds.width / 2.f, bounds.height / 2.f);
@@ -81,6 +82,11 @@ public:
         for (const auto& laser : lasers) {
             laser.render(window);
         }
+    }
+
+    void reset(int WINDOW_WIDTH, int WINDOW_HEIGHT) {
+        playerSprite.setPosition(static_cast<float>(WINDOW_WIDTH) / 2.f, static_cast<float>(WINDOW_HEIGHT) / 2.f);
+        playerLevel = initialPlayerLevel;
     }
 
     sf::FloatRect getBounds() const {
@@ -136,9 +142,8 @@ private:
     sf::Texture playerTexture;
     sf::Texture laserTexture;
     sf::Sprite playerSprite;
-    std::vector<Laser> lasers;
-
     sf::Image image;
+    std::vector<Laser> lasers;
 
     bool pIsMovingForward;
     bool pIsMovingBackwards;
