@@ -17,6 +17,7 @@ public:
 
     int playerLevel;
     int initialPlayerLevel = 10;
+    bool hasActiveLaser = false;
 
     Player(const int WINDOW_WIDTH, const int WINDOW_HEIGHT) : playerSprite() {
         if (!playerTexture.loadFromFile("../../assets/ship.png")) {
@@ -52,7 +53,7 @@ public:
         else if (key == sf::Keyboard::S) pIsMovingBackwards = isPressed;
         else if (key == sf::Keyboard::D) pIsRotatingRight = isPressed;
         else if (key == sf::Keyboard::A) pIsRotatingLeft = isPressed;
-        else if (key == sf::Keyboard::Space && isPressed) shootLaser();
+        else if (key == sf::Keyboard::Space && isPressed && !hasActiveLaser) shootLaser();
     }
 
     void update(const sf::Time deltaTime, const int windowWidth, const int windowHeight) {
@@ -79,7 +80,7 @@ public:
 
     void render(sf::RenderWindow& window) const {
         window.draw(playerSprite);
-        for (const auto& laser : lasers) {
+        for (const auto& laser : activeLasers) {
             laser.render(window);
         }
     }
@@ -102,7 +103,7 @@ public:
     }
 
     std::vector<Laser>& getLasers() {
-        return lasers;
+        return activeLasers;
     }
 
 private:
@@ -122,17 +123,18 @@ private:
     }
 
     void shootLaser() {
-        sf::Vector2f pos = playerSprite.getPosition();
-        float rotation = playerSprite.getRotation();
-        lasers.emplace_back(pos, rotation, laserTexture);
+        // Only shoot a laser if there is no active one
+        activeLasers.emplace_back(playerSprite.getPosition(), playerSprite.getRotation(), laserTexture);
+        hasActiveLaser = true;
     }
 
     void updateLasers(const sf::Time deltaTime, const int WindowWidth, const int WindowHeight) {
-        for (auto it = lasers.begin(); it != lasers.end(); ) {
+        for (auto it = activeLasers.begin(); it != activeLasers.end(); ) {
             it->update(deltaTime);
             sf::Vector2f pos = it->getPosition();
             if (pos.x < 0.f || pos.x > WindowWidth || pos.y < 0.f || pos.y > WindowHeight) { // NOLINT(*-narrowing-conversions)
-                it = lasers.erase(it);
+                it = activeLasers.erase(it);
+                hasActiveLaser = false;
             } else {
                 ++it;
             }
@@ -143,7 +145,7 @@ private:
     sf::Texture laserTexture;
     sf::Sprite playerSprite;
     sf::Image image;
-    std::vector<Laser> lasers;
+    std::vector<Laser> activeLasers;
 
     bool pIsMovingForward;
     bool pIsMovingBackwards;

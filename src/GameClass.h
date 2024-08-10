@@ -69,7 +69,9 @@ public:
     }
 
     void generateAsteroids(const int level) {
-        const sf::Vector2f playerPos = {WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f};
+        const sf::Vector2f playerPos = {WINDOW_WIDTH / 2.0f, WINDOW_HEIGHT / 2.0f}; // NOLINT(*-narrowing-conversions)
+        // ReSharper disable once CppVariableCanBeMadeConstexpr
+        // ReSharper disable once CppTooWideScope
         const float minDistance = 400.0f; // Minimum distance from the player
         for (int i = 1; i < (level + 5); i++) {
             asteroids.emplace_back(generateAsteroid_Pos(playerPos, minDistance), asteroid1, generateAsteroid_Direction(), false);
@@ -214,6 +216,7 @@ private:
             }
             if (laserHit) {
                 laserIt = lasers.erase(laserIt);
+                player.hasActiveLaser = false;
             } else {
                 ++laserIt;
             }
