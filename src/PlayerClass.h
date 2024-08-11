@@ -16,8 +16,9 @@ class Player {
 public:
 
     int playerLevel;
-    int initialPlayerLevel = 10;
+    int initialPlayerLevel = 1;
     bool hasActiveLaser = false;
+    int points = 0;
 
     Player(const int WINDOW_WIDTH, const int WINDOW_HEIGHT) : playerSprite() {
         if (!playerTexture.loadFromFile("../../assets/ship.png")) {
@@ -79,15 +80,16 @@ public:
     }
 
     void render(sf::RenderWindow& window) const {
-        window.draw(playerSprite);
         for (const auto& laser : activeLasers) {
             laser.render(window);
         }
+        window.draw(playerSprite);
     }
 
     void reset(int WINDOW_WIDTH, int WINDOW_HEIGHT) {
         playerSprite.setPosition(static_cast<float>(WINDOW_WIDTH) / 2.f, static_cast<float>(WINDOW_HEIGHT) / 2.f);
         playerLevel = initialPlayerLevel;
+        points = 0;
     }
 
     sf::FloatRect getBounds() const {

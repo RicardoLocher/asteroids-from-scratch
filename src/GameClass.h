@@ -16,8 +16,8 @@
 
 class Game {
 public:
-    const int WINDOW_WIDTH = 3440;
-    const int WINDOW_HEIGHT = 1440;
+    const int WINDOW_WIDTH = 1920;
+    const int WINDOW_HEIGHT = 1080;
 
     Game() : window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFML ROCKS!!!"), player(WINDOW_WIDTH, WINDOW_HEIGHT), font(), fpsText() {
         if (!font.loadFromFile("../../assets/manolomono.otf")) {
@@ -37,6 +37,16 @@ public:
         fpsText.setCharacterSize(24);
         fpsText.setFillColor(sf::Color::White);
         fpsText.setPosition(10.f, 10.f);
+
+        levelText.setFont(font);
+        levelText.setCharacterSize(24);
+        levelText.setFillColor(sf::Color::White);
+        levelText.setPosition(10.f, 40.f);
+
+        pointsText.setFont(font);
+        pointsText.setCharacterSize(24);
+        pointsText.setFillColor(sf::Color::White);
+        pointsText.setPosition(10.f, 70.f);
 
         gameOver = false;
         gameOverText.setFont(font);
@@ -73,7 +83,7 @@ public:
         // ReSharper disable once CppVariableCanBeMadeConstexpr
         // ReSharper disable once CppTooWideScope
         const float minDistance = 400.0f; // Minimum distance from the player
-        for (int i = 1; i < (level + 5); i++) {
+        for (int i = 1; i < (level + 6); i++) {
             asteroids.emplace_back(generateAsteroid_Pos(playerPos, minDistance), asteroid1, generateAsteroid_Direction(), false);
         }
     }
@@ -152,6 +162,9 @@ private:
             fpsClock.restart();
         }
 
+        levelText.setString("LEVEL: " + std::to_string(player.playerLevel));
+        pointsText.setString("Points: " + std::to_string(player.points));
+
         player.update(deltaTime, WINDOW_WIDTH, WINDOW_HEIGHT);
         updateAsteroids(deltaTime,  WINDOW_WIDTH, WINDOW_HEIGHT);
     }
@@ -163,6 +176,8 @@ private:
         } else {
             player.render(window);
             window.draw(fpsText);
+            window.draw(levelText);
+            window.draw(pointsText);
             for (const auto& asteroid : asteroids) {
                 asteroid.render(window);
             }
@@ -203,11 +218,13 @@ private:
                     // ReSharper disable once CppDFAUnusedValue
                     if (asteroidIt -> isMini) {
                         asteroidIt = asteroids.erase(asteroidIt);
+                        player.points += 10;
                     }
                     else {
                         sf::Vector2f pos = asteroidIt -> getPosition();
                         asteroidIt = asteroids.erase(asteroidIt);
                         generateMiniAsteroids(pos);
+                        player.points += 10;
                     }
                     laserHit = true;
                     break;
@@ -273,6 +290,9 @@ private:
 
     bool gameOver;
     sf::Text gameOverText;
+
+    sf::Text pointsText;
+    sf::Text levelText;
 };
 
 #endif //GAMECLASS_H
