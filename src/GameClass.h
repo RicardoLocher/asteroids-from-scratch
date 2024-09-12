@@ -128,6 +128,11 @@ public:
         fpsClock.restart();
     }
 
+    void nextLevel() {
+        player.playerLevel += 1;
+        generateAsteroids(player.playerLevel);
+    }
+
 private:
     void processEvents() {
         sf::Event event{};
@@ -196,6 +201,9 @@ private:
             } else {
                 ++i;
             }
+        }
+        if (asteroids.size() == 0) {
+            nextLevel();
         }
     }
 
