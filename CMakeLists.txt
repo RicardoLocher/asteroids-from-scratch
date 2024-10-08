@@ -12,9 +12,13 @@ FetchContent_MakeAvailable(SFML)
 
 add_executable(untitled src/main.cpp
         src/GameClass.h
-        src/PlayerClass.h
-        src/LaserClass.h
-        src/AsteroidClass.h)
+        src/Entities/Player.h
+        src/Entities/Laser.h
+        src/Entities/AsteroidClass.h
+        src/GameClass.cpp
+        src/Entities/AsteroidClass.cpp
+        src/Entities/Player.cpp
+        src/Entities/Laser.cpp)
 target_link_libraries(untitled PRIVATE sfml-graphics)
 target_compile_features(untitled PRIVATE cxx_std_17)
 
