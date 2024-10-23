@@ -18,7 +18,9 @@ add_executable(untitled src/main.cpp
         src/GameClass.cpp
         src/Entities/AsteroidClass.cpp
         src/Entities/Player.cpp
-        src/Entities/Laser.cpp)
+        src/Entities/Laser.cpp
+        src/Gui/Star.h
+        src/Gui/Starbackground.h)
 target_link_libraries(untitled PRIVATE sfml-graphics)
 target_compile_features(untitled PRIVATE cxx_std_17)
 

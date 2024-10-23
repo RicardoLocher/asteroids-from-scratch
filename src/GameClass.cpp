@@ -6,8 +6,9 @@
 #include <random>
 
 #include "GameClass.h"
+#include "Gui/Starbackground.h"
 
-Game::Game() : window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "SFML ROCKS!!!"), player(WINDOW_WIDTH, WINDOW_HEIGHT), font(), fpsText()  {
+Game::Game() : window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "ASTEROIDS"), player(WINDOW_WIDTH, WINDOW_HEIGHT), starBackground(window, 100), font(), fpsText()  {
     if (!font.loadFromFile("../../assets/manolomono.otf")) {
         std::cout << "Error Loading Font \n";
         return;
@@ -81,6 +82,9 @@ void Game::processEvents() {
                 }
             break;
 
+            case sf::Event::Resized:
+                starBackground.updateOnResize();
+
             case sf::Event::KeyReleased:
                 player.handleInput(event.key.code, false);
             break;
@@ -107,6 +111,7 @@ void Game::update(sf::Time deltaTime) {
 }
 void Game::render() {
     window.clear();
+    starBackground.draw(window);
     if  (gameOver) {
         window.draw(gameOverText);
     } else {

@@ -10,6 +10,7 @@
 #include "Entities/Player.h"
 #include "Entities/AsteroidClass.h"
 #include "Entities/Laser.h"
+#include "Gui/Starbackground.h"
 
 class Game {
 public:
@@ -54,6 +55,8 @@ private:
     sf::Clock fpsClock;
     int frameCount;
     float fps;
+
+    StarBackground starBackground;
 
     std::vector<Asteroid> asteroids;
     sf::Texture asteroid1;
