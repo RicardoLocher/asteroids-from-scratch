@@ -7,8 +7,12 @@
 
 #include "GameClass.h"
 #include "Gui/Starbackground.h"
+#include "Gui/StartMenu.h"
 
 Game::Game() : window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "ASTEROIDS"), player(WINDOW_WIDTH, WINDOW_HEIGHT), starBackground(window, 100), font(), fpsText()  {
+
+    startMenu(window);
+
     if (!font.loadFromFile("../../assets/manolomono.otf")) {
         std::cout << "Error Loading Font \n";
         return;
@@ -77,7 +81,11 @@ void Game::processEvents() {
             case sf::Event::KeyPressed:
                 if (gameOver && event.key.code == sf::Keyboard::R) {
                     resetGame();
-                } else {
+                }
+                else if(event.key.code == sf::Keyboard::Escape) {
+                    startMenu(window);
+                }
+                else {
                     player.handleInput(event.key.code, true);
                 }
             break;
@@ -266,3 +274,13 @@ void Game::nextLevel() {
     generateAsteroids(player.playerLevel);
 }
 
+void Game::startMenu(sf::RenderWindow& window) {
+    StartMenu menu(window);
+    int menuSelection = menu.displayMenu();
+    if (menuSelection == 0) {
+        resetGame();
+    }
+    else {
+        window.close();
+    }
+}

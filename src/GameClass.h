@@ -16,6 +16,7 @@ class Game {
 public:
     const int WINDOW_WIDTH = 1920;
     const int WINDOW_HEIGHT = 1080;
+    sf::RenderWindow window;
 
     Game();
 
@@ -30,6 +31,7 @@ public:
     // Game flow control
     void resetGame();
     void nextLevel();
+    void startMenu(sf::RenderWindow& window);
 
 private:
     // game cycle logic
@@ -45,7 +47,7 @@ private:
     void checkCollisions();
     static bool pixelPerfectCollision(const sf::Sprite& sprite1, const sf::Image& image1, const sf::Sprite& sprite2, const sf::Image& image2);
 
-    sf::RenderWindow window;
+
     sf::Time TimePerFrame = sf::seconds(1.f / 144.f);
 
     Player player;
