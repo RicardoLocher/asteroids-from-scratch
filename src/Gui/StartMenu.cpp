@@ -5,7 +5,11 @@
 #include "StartMenu.h"
 
 StartMenu::StartMenu(sf::RenderWindow& window) : m_window(window), m_selectedIndex(0), background(m_window, 100) {
-    // Load font (replace with the path to your font file)
+
+    if (!backgroundMusic.openFromFile("../../assets/OutThere.ogg")) {
+        throw std::runtime_error("Failed to load background music");
+    }
+
     if (!m_font.loadFromFile("../../assets/manolomono.otf")) {
         throw std::runtime_error("Failed to load font");
     }
@@ -36,6 +40,7 @@ StartMenu::StartMenu(sf::RenderWindow& window) : m_window(window), m_selectedInd
 }
 
 int StartMenu::displayMenu() {
+    backgroundMusic.play();
     while (m_window.isOpen()) {
         handleInput();
         m_window.clear();

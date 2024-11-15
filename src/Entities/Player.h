@@ -9,6 +9,7 @@
 #include "vector"
 
 #include "../../cmake-build-debug/_deps/sfml-src/include/SFML/Graphics.hpp"
+#include "SFML/Audio.hpp"
 
 class Player {
 public:
@@ -59,6 +60,9 @@ private:
     bool pIsRotatingRight;
     bool pIsRotatingLeft;
     bool pIsShooting;
+
+    sf::SoundBuffer shotSoundBuffer;
+    sf::Sound shotSound;
 
     float playerRadius = 10.f;
     float movementSpeed = 500.f;

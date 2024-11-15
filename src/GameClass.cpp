@@ -24,6 +24,18 @@ Game::Game() : window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "ASTEROIDS"), 
         std::cout << "Error Loading meteor2.png \n";
     }
 
+    if (!asteroidLargeBuffer.loadFromFile("../../assets/Asteroid-hit-large.wav")) {
+        std::cout << "Error Loading Asteroid Hit Sound Large \n";
+    }
+    asteroidLargeSound.setBuffer(asteroidLargeBuffer);
+    asteroidLargeSound.setVolume(20.0f);
+
+    if (!asteroidSmallBuffer.loadFromFile("../../assets/Asteroid-hit-small.wav")) {
+        std::cout << "Error Loading Asteroid Hit Sound Small \n";
+    }
+    asteroidSmallSound.setBuffer(asteroidSmallBuffer);
+    asteroidSmallSound.setVolume(20.0f);
+
     fps = 0;
     frameCount = 0;
     fpsText.setFont(font);
@@ -205,10 +217,12 @@ void Game::checkCollisions() {
                 // Handle collision (e.g., destroy asteroid, remove laser)
                 // ReSharper disable once CppDFAUnusedValue
                 if (asteroidIt -> isMini) {
+                    asteroidSmallSound.play();
                     asteroidIt = asteroids.erase(asteroidIt);
                     player.points += 10;
                 }
                 else {
+                    asteroidLargeSound.play();
                     sf::Vector2f pos = asteroidIt -> getPosition();
                     asteroidIt = asteroids.erase(asteroidIt);
                     generateMiniAsteroids(pos);

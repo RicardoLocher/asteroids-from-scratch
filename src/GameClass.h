@@ -6,6 +6,7 @@
 #define GAMECLASS_H
 
 #include "SFML/Graphics.hpp"
+#include "SFML/Audio.hpp"
 
 #include "Entities/Player.h"
 #include "Entities/AsteroidClass.h"
@@ -69,6 +70,12 @@ private:
 
     sf::Text pointsText;
     sf::Text levelText;
+
+    sf::SoundBuffer asteroidLargeBuffer;
+    sf::Sound asteroidLargeSound;
+
+    sf::SoundBuffer asteroidSmallBuffer;
+    sf::Sound asteroidSmallSound;
 };
 
 #endif //GAMECLASS_H

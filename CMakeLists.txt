@@ -23,7 +23,7 @@ add_executable(untitled src/main.cpp
         src/Gui/Starbackground.h
         src/Gui/StartMenu.h
         src/Gui/StartMenu.cpp)
-target_link_libraries(untitled PRIVATE sfml-graphics)
+target_link_libraries(untitled PRIVATE sfml-graphics sfml-audio)
 target_compile_features(untitled PRIVATE cxx_std_17)
 
 if(WIN32)

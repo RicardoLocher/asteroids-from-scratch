@@ -7,6 +7,14 @@
 #include "Player.h"
 
 Player::Player(int WINDOW_WIDTH, int WINDOW_HEIGHT) : playerSprite() {
+
+    if (!shotSoundBuffer.loadFromFile("../../assets/shot1.wav")) {
+        std::cout << "Error loading shot Sound\n";
+        return;
+    }
+    shotSound.setBuffer(shotSoundBuffer);
+    shotSound.setVolume(25);
+
     if (!playerTexture.loadFromFile("../../assets/ship.png")) {
         std::cout << "Error loading Player Texture\n";
         return;
@@ -98,6 +106,7 @@ void Player::checkWindowBounds(sf::Vector2f& position, int windowWidth, int wind
 void Player::shootLaser() {
     // Only shoot a laser if there is no active one
     activeLasers.emplace_back(playerSprite.getPosition(), playerSprite.getRotation(), laserTexture);
+    shotSound.play();
     hasActiveLaser = true;
 }
 void Player::updateLasers(sf::Time deltaTime, int WindowWidth, int WindowHeight) {

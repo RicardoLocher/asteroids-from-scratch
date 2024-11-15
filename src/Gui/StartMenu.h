@@ -6,6 +6,7 @@
 #define STARTMENU_H
 
 #include <SFML/Graphics.hpp>
+#include <SFML/Audio.hpp>
 #include <vector>
 #include <string>
 
@@ -28,6 +29,8 @@ private:
 
     sf::Texture titleTexture;
     sf::Sprite titleSprite;
+
+    sf::Music backgroundMusic;
 
     // Helper methods
     void handleInput();
